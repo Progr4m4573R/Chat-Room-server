@@ -23,7 +23,7 @@ list_of_clients=[]
 
 def clientthread(conn, addr):
     #Convert string to bytes so it can be sent source: https://stackoverflow.com/questions/7585435/best-way-to-convert-string-to-bytes-in-python-3
-    conn.send(bytes(('Welcome to this chatroom! user: ', addr),'utf-8',))
+    conn.send(bytes(('Welcome to this chatroom! user: '),'utf-8',))
     #sends a message to the client whose user object is conn
     while True:
             try:     
