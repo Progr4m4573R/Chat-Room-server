@@ -23,7 +23,7 @@ list_of_clients=[]
 
 def clientthread(conn, addr):
     #Convert string to bytes so it can be sent source: https://stackoverflow.com/questions/7585435/best-way-to-convert-string-to-bytes-in-python-3
-    conn.send(bytes(('Welcome to this chatroom! user: ', addr),'utf-8',))
+    conn.send(bytes(('Welcome to this chatroom! user: '),'utf-8',))
     #sends a message to the client whose user object is conn
     while True:
             try:     
@@ -34,7 +34,7 @@ def clientthread(conn, addr):
                     broadcast(message_to_send,conn)
                     #prints the message and address of the user who just sent the message on the server terminal
                 else:
-                    remove(conn)
+                    remove(conn,addr)
             except:
                 continue
 
@@ -47,10 +47,10 @@ def broadcast(message,connection):
                 clients.close()
                 remove(clients)
 
-def remove(connection):
+def remove(connection,addr):
     if connection in list_of_clients:
         list_of_clients.remove(connection)
-
+        print(addr,"left the chat.")
 while True:
     conn, addr = server.accept()
     """
@@ -58,7 +58,7 @@ while True:
     the IP address of the client that just connected
     """
     list_of_clients.append(conn)
-    print(addr[0] + " connected")
+    print(addr[0] + " joined the chat.")
     #maintains a list of clients for ease of broadcasting a message to all available people in the chatroom
     #Prints the address of the person who just connected
     start_new_thread(clientthread,(conn,addr))
