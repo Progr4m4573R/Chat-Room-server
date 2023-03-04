@@ -19,7 +19,7 @@ while True:
             message = socks.recv(2048)
             print(message)
 
-        else:
+        elif socks!=server:
             message = sys.stdin.readline()
             server.send(message)
             sys.stdout.write("<You>")
