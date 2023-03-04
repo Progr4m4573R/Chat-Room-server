@@ -1,9 +1,8 @@
 import socket
-import select
-from threading import *
+from _thread import *
 import sys
 
-
+#We made a socket object and reserved a port on our pc.
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 """
 the first argument AF_INET is the address domain of the socket. This is used when we have an Internet Domain
@@ -23,7 +22,8 @@ server.listen(100)
 list_of_clients=[]
 
 def clientthread(conn, addr):
-    conn.send("Welcome to this chatroom!")
+    #Convert string to bytes so it can be sent source: https://stackoverflow.com/questions/7585435/best-way-to-convert-string-to-bytes-in-python-3
+    conn.send(bytes('Welcome to this chatroom!','utf-8'))
     #sends a message to the client whose user object is conn
     while True:
             try:     
@@ -62,6 +62,7 @@ while True:
     #maintains a list of clients for ease of broadcasting a message to all available people in the chatroom
     #Prints the address of the person who just connected
     start_new_thread(clientthread,(conn,addr))
+    
     #creates and individual thread for every user that connects
 
 conn.close()
