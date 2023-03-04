@@ -50,7 +50,7 @@ def broadcast(message,connection):
 def remove(connection,addr):
     if connection in list_of_clients:
         list_of_clients.remove(connection)
-        print(addr,"left the chat.")
+        print(addr[0],"left the chat.")
 while True:
     conn, addr = server.accept()
     """
