@@ -6,23 +6,23 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 if len(sys.argv) != 3:
     print ("Correct usage: script, IP address, port number")
     exit()
+
 IP_address = str(sys.argv[1])
 Port = int(sys.argv[2])
 server.connect((IP_address, Port))
 
-while True:
-    sockets_list = [server]
-    read_sockets,_,_ = select.select(sockets_list,[],[])
-    
-    for socks in read_sockets:
-        if socks == server:
-            message = socks.recv(2048)
-            print(message)
+#welcome message  
+message = server.recv(2048)
+print(message)
 
-        elif socks!=server:
-            message = sys.stdin.readline()
-            server.send(message)
-            sys.stdout.write("<You>")
-            sys.stdout.write(message)
-            sys.stdout.flush()
+while True:
+    try:#user message
+        message = bytes(input("<You> "),'utf-8')# fixed error with message not sending because it needed to be in bytes format
+        if 'Exit' == message:
+            break
+        #print(f'Processing Message from input() *****{message}*****')
+        server.send(message)
+    except Exception as e:
+        print("Error in client.py: ",e)
 server.close()
+            

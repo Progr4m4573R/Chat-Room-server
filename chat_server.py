@@ -1,7 +1,6 @@
 import socket
 from _thread import *
 import sys
-
 #We made a socket object and reserved a port on our pc.
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 """
@@ -23,47 +22,62 @@ list_of_clients=[]
 
 def clientthread(conn, addr):
     #Convert string to bytes so it can be sent source: https://stackoverflow.com/questions/7585435/best-way-to-convert-string-to-bytes-in-python-3
-    conn.send(bytes(('Welcome to this chatroom! user: '),'utf-8',))
+    text = bytes(('Welcome to the chatroom!'),'utf-8')
+    conn.send(text)
     #sends a message to the client whose user object is conn
-    while True:
-            try:     
-                message = conn.recv(2048)    
-                if message:
-                    print("<" + addr[0] + "> " + message)
-                    message_to_send = "<" + addr[0] + "> " + message
-                    broadcast(message_to_send,conn)
-                    #prints the message and address of the user who just sent the message on the server terminal
-                else:
-                    remove(conn,addr)
-            except:
-                continue
+    try:     
+        message = conn.recv(2048)
+        #decode bytes to string for concatination
+        message = message.decode("utf-8") 
+        if message:#fixed Error with clientthread function not being able to concatinate bytes  source: https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
+            print("<" + addr[0] + "> says: " + message)
+            message_to_send = "<" + addr[0] + "> says: " + message
+            broadcast(message_to_send,conn)
+            #prints the message and address of the user who just sent the message on the server terminal
+        elif not(message):
+            pass
+    except Exception as e:
+        print ("Error occured in clientthread", e)
+        remove(conn,addr)
 
+        
 def broadcast(message,connection):
     for clients in list_of_clients:
+        #You cannot send a message from the same ip as the server or this code will not run
         if clients!=connection:
             try:
-                clients.send(message)
-            except:
+                clients.send(bytes(message,'utf-8'))
+            except Exception as e:
+                print("Error occured in broadcast: ",e)
                 clients.close()
-                remove(clients)
+                remove(clients,addr)
+        else:
+            print("Attempting to launch a client on server IP, broadcast will not be executed")
 
 def remove(connection,addr):
-    if connection in list_of_clients:
-        list_of_clients.remove(connection)
-        print(addr[0],"left the chat.")
+    try:
+        if connection in list_of_clients:
+            list_of_clients.remove(connection)
+            print(addr[0],"left the chat.")
+    except Exception as e:
+        print("Error occured in remove: ",e)
+        
 while True:
-    conn, addr = server.accept()
-    """
-    Accepts a connection request and stores two parameters, conn which is a socket object for that user, and addr which contains
-    the IP address of the client that just connected
-    """
-    list_of_clients.append(conn)
-    print(addr[0] + " joined the chat.")
-    #maintains a list of clients for ease of broadcasting a message to all available people in the chatroom
-    #Prints the address of the person who just connected
-    start_new_thread(clientthread,(conn,addr))
-    
-    #creates and individual thread for every user that connects
-
+    try:
+        conn, addr = server.accept()
+        """
+        Accepts a connection request and stores two parameters, conn which is a socket object for that user, and addr which contains
+        the IP address of the client that just connected
+        """
+        list_of_clients.append(conn)
+        print(addr[0] + " joined the chat.")
+        #maintains a list of clients for ease of broadcasting a message to all available people in the chatroom
+        #Prints the address of the person who just connected
+        start_new_thread(clientthread,(conn,addr))
+        
+        #creates and individual thread for every user that connects
+    except Exception as e:
+        print("Error occured in chat_server.py: main: ",e)
+        break
 conn.close()
 server.close()
