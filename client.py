@@ -9,9 +9,10 @@ if len(sys.argv) != 3:
 
 IP_address = str(sys.argv[1])
 Port = int(sys.argv[2])
+#connect to server
 server.connect((IP_address, Port))
 
-#welcome message  
+#receive welcome message from server  
 message = server.recv(2048)
 print(message)
 

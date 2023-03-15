@@ -19,6 +19,7 @@ server.bind((IP_address, Port))
 server.listen(100)
 #listens for 100 active connections. This number can be increased as per convenience
 list_of_clients=[]
+list_of_addr=[]
 
 def clientthread(conn, addr):
     #Convert string to bytes so it can be sent source: https://stackoverflow.com/questions/7585435/best-way-to-convert-string-to-bytes-in-python-3
@@ -32,7 +33,7 @@ def clientthread(conn, addr):
         if message:#fixed Error with clientthread function not being able to concatinate bytes  source: https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
             print("<" + addr[0] + "> says: " + message)
             message_to_send = "<" + addr[0] + "> says: " + message
-            broadcast(message_to_send,conn)
+            broadcast(message_to_send,conn,addr[0])
             #prints the message and address of the user who just sent the message on the server terminal
         elif not(message):
             pass
@@ -41,18 +42,22 @@ def clientthread(conn, addr):
         remove(conn,addr)
 
         
-def broadcast(message,connection):
-    for clients in list_of_clients:
-        #You cannot send a message from the same ip as the server or this code will not run
-        if clients!=connection:
-            try:
-                clients.send(bytes(message,'utf-8'))
-            except Exception as e:
-                print("Error occured in broadcast: ",e)
-                clients.close()
-                remove(clients,addr)
-        else:
-            print("Attempting to launch a client on server IP, broadcast will not be executed")
+def broadcast(message,connection,addr):
+    #You cannot send a message from the same ip as the server or this code will not run
+    hostname=socket.gethostname()
+    server_addr = socket.gethostbyname(hostname)
+    # print("device ip: ",addr)
+    # print("server ip: ",server_addr)
+    #If the ip address of device sending message is different to the server device then run
+    if addr != server_addr:
+        try:
+            connection.send(bytes(message,'utf-8'))
+        except Exception as e:
+            print("Error occured in broadcast: ",e)
+            connection.close()
+            remove(connection,addr)
+    else:
+        print("Attempting to broadcast a message from client on server IP, broadcast will not be executed")#a client cannot be run and broadcast from the same ip as the server
 
 def remove(connection,addr):
     try:
@@ -70,6 +75,7 @@ while True:
         the IP address of the client that just connected
         """
         list_of_clients.append(conn)
+        list_of_addr.append(addr)
         print(addr[0] + " joined the chat.")
         #maintains a list of clients for ease of broadcasting a message to all available people in the chatroom
         #Prints the address of the person who just connected
