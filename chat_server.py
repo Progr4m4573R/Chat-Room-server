@@ -38,24 +38,29 @@ def clientthread(conn, addr):
         elif not(message):
             pass
     except Exception as e:
-        print ("Error occured in clientthread", e)
+        print ("Error occured in clientthread: ", e)
         remove(conn,addr)
 
         
-def broadcast(message,connection,addr):
+def broadcast(message,conn,addr):
     #You cannot send a message from the same ip as the server or this code will not run
     hostname=socket.gethostname()
     server_addr = socket.gethostbyname(hostname)
+    
+    message = bytes(" Hallaoleyuhaebdba",'utf-8')
+    print("Message from clienthrread: ", message)
+    conn.send(message)
     # print("device ip: ",addr)
     # print("server ip: ",server_addr)
     #If the ip address of device sending message is different to the server device then run
     if addr != server_addr:
         try:
-            connection.send(bytes(message,'utf-8'))
+            text = bytes((message),'utf-8')
+            conn.send(text)
         except Exception as e:
             print("Error occured in broadcast: ",e)
-            connection.close()
-            remove(connection,addr)
+            conn.close()
+            remove(conn,addr)
     else:
         print("Attempting to broadcast a message from client on server IP, broadcast will not be executed")#a client cannot be run and broadcast from the same ip as the server
 
@@ -83,7 +88,7 @@ while True:
         
         #creates and individual thread for every user that connects
     except Exception as e:
-        print("Error occured in chat_server.py: main: ",e)
+        print("Error occured in chat_server.py, main: ",e)
         break
 conn.close()
 server.close()

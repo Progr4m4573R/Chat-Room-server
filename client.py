@@ -14,8 +14,10 @@ server.connect((IP_address, Port))
 
 #receive welcome message from server  
 message = server.recv(2048)
+message = message.decode("utf-8") 
 print(message)
-
+#change your username
+host = socket.gethostname()
 while True:
     try:#user message
         message = bytes(input("<You> "),'utf-8')# fixed error with message not sending because it needed to be in bytes format
