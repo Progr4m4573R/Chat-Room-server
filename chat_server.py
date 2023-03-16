@@ -23,17 +23,19 @@ list_of_addr=[]
 
 def clientthread(conn, addr):
     #Convert string to bytes so it can be sent source: https://stackoverflow.com/questions/7585435/best-way-to-convert-string-to-bytes-in-python-3
-    text = bytes(('Welcome to the chatroom!'),'utf-8')
-    conn.send(text)
+    
     #sends a message to the client whose user object is conn
-    try:     
+    conn.send(bytes(('Welcome to the chatroom!'),'utf-8'))
+
+    try:
+        #Recieve message from client     
         message = conn.recv(2048)
         #decode bytes to string for concatination
         message = message.decode("utf-8") 
         if message:#fixed Error with clientthread function not being able to concatinate bytes  source: https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
             print("<" + addr[0] + "> says: " + message)
             message_to_send = "<" + addr[0] + "> says: " + message
-            broadcast(message_to_send,conn,addr[0])
+            broadcast(message_to_send,conn,addr)
             #prints the message and address of the user who just sent the message on the server terminal
         elif not(message):
             pass
@@ -46,17 +48,13 @@ def broadcast(message,conn,addr):
     #You cannot send a message from the same ip as the server or this code will not run
     hostname=socket.gethostname()
     server_addr = socket.gethostbyname(hostname)
-    
-    message = bytes(" Hallaoleyuhaebdba",'utf-8')
-    print("Message from clienthrread: ", message)
-    conn.send(message)
+
     # print("device ip: ",addr)
     # print("server ip: ",server_addr)
     #If the ip address of device sending message is different to the server device then run
-    if addr != server_addr:
+    if addr[0] != server_addr:
         try:
-            text = bytes((message),'utf-8')
-            conn.send(text)
+            conn.send(bytes((message),'utf-8'))
         except Exception as e:
             print("Error occured in broadcast: ",e)
             conn.close()
