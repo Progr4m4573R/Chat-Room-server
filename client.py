@@ -26,11 +26,11 @@ while message_sent.lower().strip()!= 'exit':
     try:
         #send user message
         client.send(message_sent)
-
+        
         #receive user messages from server 
         message_received = client.recv(2048).decode("utf-8") 
         print(message_received)
-
+        
         #ask user for input again
         message_sent = bytes(input("<You> "),'utf-8')# fixed error with message not sending because it needed to be in bytes format
     except Exception as e:
