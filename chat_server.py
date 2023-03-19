@@ -26,22 +26,24 @@ def clientthread(conn, addr):
     
     #sends a message to the client whose user object is conn
     conn.send(bytes(('Welcome to the chatroom!'),'utf-8'))
+    while True:
+        try:
+            #Recieve message from client and decode bytes to string for concatination
+            message = conn.recv(2048).decode("utf-8") 
 
-    try:
-        #Recieve message from client     
-        message = conn.recv(2048)
-        #decode bytes to string for concatination
-        message = message.decode("utf-8") 
-        if message:#fixed Error with clientthread function not being able to concatinate bytes  source: https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
-            print("<" + addr[0] + "> says: " + message)
-            message_to_send = "<" + addr[0] + "> says: " + message
-            broadcast(message_to_send,conn,addr)
-            #prints the message and address of the user who just sent the message on the server terminal
-        elif not(message):
-            pass
-    except Exception as e:
-        print ("Error occured in clientthread: ", e)
-        remove(conn,addr)
+            if message:#fixed Error with clientthread function not being able to concatinate bytes  source: https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
+                print("<" + addr[0] + "> says: " + message)
+                message_to_send = "<" + addr[0] + "> says: " + message
+                broadcast(message_to_send,conn,addr)
+                #prints the message and address of the user who just sent the message on the server terminal
+            elif not(message):
+                pass
+            server_message = input('->')
+            conn.send(server_message.encode())
+        except Exception as e:
+            print ("Error occured in clientthread: ", e)
+            remove(conn,addr)
+            
 
         
 def broadcast(message,conn,addr):
@@ -89,4 +91,3 @@ while True:
         print("Error occured in chat_server.py, main: ",e)
         break
 conn.close()
-server.close()
