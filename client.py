@@ -17,7 +17,7 @@ host = socket.gethostname()
 host_ip = socket.gethostbyname(host)
 
 message = bytes(input("<You> "),'utf-8')# fixed error with message not sending because it needed to be in bytes format
-while message.lower.strip()!= 'exit':
+while message.lower().strip()!= 'exit':
     try:
         #receive welcome message from server 
         message = client.recv(2048)
