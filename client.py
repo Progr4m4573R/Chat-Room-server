@@ -22,7 +22,7 @@ print(message_received)
 
 #take user input
 message_sent = bytes(input("<You> "),'utf-8')# fixed error with message not sending because it needed to be in bytes format
-while message_sent.lower().strip()!= 'exit':
+while 'exit' not in message_sent:
     try:
         #send user message
         client.send(message_sent)

@@ -34,9 +34,12 @@ def clientthread(conn, addr):
             #fixed Error with clientthread function not being able to concatinate bytes  source: https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
             #prints the message and address of the user who just sent the message on the server terminal
             print("<" + addr[0] + "> says: " + message)
-            message_to_send = "<" + addr[0] + "> says: " + message
+            message_to_send = "<" + addr[0] + "> says: " + message+"\n"
             broadcast(message_to_send,conn,addr)
-
+            #Allows server to send messages
+            # server_message = input('<Server> ')
+            # message_to_send = "<Server>:*** " +server_message+" ***"
+            # conn.send(message_to_send.encode())
         except Exception as e:
             print ("Error occured in clientthread: ", e)
             remove(conn,addr)
@@ -50,11 +53,8 @@ def broadcast(message,conn,addr):
     #If the ip address of device sending message is different to the server device then run
 
     try:
-        #Allows server to send messages
-        # server_message = input('<Server>: ')
-        # message_to_send = "<Server>:*** " +server_message+" ***"
-        # conn.send(message_to_send.encode())
-        conn.send(message.encode())
+        for client in list_of_clients:    
+            client.send(message.encode())
     except Exception as e:
         print("Error occured in broadcast: ",e)
         conn.close()
